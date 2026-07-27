@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carstran</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23111%22/><text x=%2250%22 y=%2265%22 font-size=%2240%22 fill=%22%23fff%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22>C</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" crossorigin="anonymous">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#f5f5f5;color:#111;min-height:100vh}
+.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#1a3a6b,#0d2040);display:flex;align-items:center;justify-content:center;z-index:500;padding:1.5rem}
+.login-screen.hidden{display:none}
+.login-box{background:#fff;border-radius:16px;padding:2rem 1.75rem;width:100%;max-width:360px}
+.login-logo{text-align:center;margin-bottom:1.5rem}
+.logo-big{background:#111;color:#fff;font-weight:700;font-size:1.5rem;padding:.5rem 1.2rem;border-radius:8px;letter-spacing:2px;display:inline-block}
+.login-logo p{font-size:.82rem;color:#888;margin-top:.5rem}
+.lfield{margin-bottom:.9rem}
+.lfield label{font-size:.8rem;color:#666;margin-bottom:4px;display:block}
+.lfield input,.lfield select{width:100%;font-size:.95rem;padding:.6rem .85rem;border:1.5px solid #ddd;border-radius:8px;outline:none;background:#fff;color:#111}
+.lfield input:focus,.lfield select:focus{border-color:#1a3a6b}
+.btn-login{width:100%;padding:.75rem;background:#1a3a6b;color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:.5rem}
+.btn-login:hover{background:#14305a}
+.login-err{color:#c0392b;font-size:.8rem;margin-top:.5rem;text-align:center;display:none}
+.recov-link{text-align:center;margin-top:.75rem}
+.recov-link button{background:none;border:none;color:#aaa;font-size:.75rem;cursor:pointer;text-decoration:underline}
+.recov-box{display:none;margin-top:1rem;border-top:1px solid #eee;padding-top:1rem}
+.recov-err{color:#c0392b;font-size:.78rem;margin-bottom:6px;display:none}
+.header{background:#1a3a6b;color:#fff;padding:.9rem 1.25rem;display:flex;align-items:center;gap:1rem}
+.logo-box{background:#111;color:#fff;font-weight:700;font-size:1.1rem;padding:.4rem .9rem;border-radius:6px;letter-spacing:1px;flex-shrink:0}
+.header-info{flex:1;min-width:0}
+.header-info h1{font-size:.95rem;font-weight:500;opacity:.9}
+.header-info p{font-size:.75rem;opacity:.7}
+.header-user{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.ubadge{font-size:.72rem;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
+.badmin{background:#f39c12;color:#fff}
+.badminexec{background:#2874a6;color:#fff}
+.bfunc{background:rgba(255,255,255,.2);color:#fff}
+.btn-logout{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:6px;padding:.3rem .65rem;font-size:.78rem;cursor:pointer}
+.nav-tabs{display:flex;background:#fff;border-bottom:.5px solid #ddd;overflow-x:auto}
+.nav-tab{padding:.7rem .9rem;font-size:.8rem;cursor:pointer;border-bottom:2px solid transparent;color:#666;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0}
+.nav-tab.active{border-bottom-color:#1a3a6b;color:#1a3a6b;font-weight:600}
+.lock-icon{font-size:.65rem;color:#f39c12;margin-left:2px}
+.content{padding:1.1rem;max-width:820px;margin:0 auto}
+.section{background:#fff;border:.5px solid #ddd;border-radius:10px;padding:1.1rem;margin-bottom:.9rem}
+.stitle{font-size:.77rem;font-weight:700;color:#1a3a6b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.9rem;display:flex;align-items:center;gap:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column;gap:3px}
+.field label{font-size:.75rem;color:#666}
+.field input,.field select,.field textarea{font-size:.875rem;padding:.46rem .68rem;border:.5px solid #ccc;border-radius:6px;background:#fff;color:#111;width:100%}
+.field textarea{resize:vertical;min-height:65px}
+.field input[readonly]{background:#f5f5f5;color:#666}
+.sel-box{border:.5px solid #ccc;border-radius:8px;padding:.65rem;cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff}
+.sel-box:hover{background:#f5f5f5}
+.m-av{width:40px;height:40px;border-radius:50%;background:#e6f1fb;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.88rem;color:#185FA5;flex-shrink:0;overflow:hidden}
+.m-av img{width:100%;height:100%;object-fit:cover}
+.parada-card{border:.5px solid #ddd;border-radius:8px;padding:.85rem;margin-bottom:.65rem;background:#fafafa}
+.p-num{background:#1a3a6b;color:#fff;border-radius:50%;width:22px;height:22px;font-size:.73rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tbadge{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.badge{font-size:.72rem;padding:2px 8px;border-radius:4px;font-weight:500}
+.brota{background:#e6f1fb;color:#185FA5}
+.bpar{background:#FAEEDA;color:#633806}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.res-card{background:#f5f5f5;border-radius:8px;padding:.65rem .9rem;text-align:center}
+.res-label{font-size:.7rem;color:#888;margin-bottom:2px}
+.res-val{font-size:.95rem;font-weight:600;color:#1a3a6b}
+.grav-btns{display:flex;gap:6px}
+.grav-btn{flex:1;padding:.4rem;font-size:.77rem;border:.5px solid #ccc;border-radius:6px;cursor:pointer;background:#f8f8f8;color:#666}
+.ggl{background:#eaf3de;border-color:#639922;color:#3B6D11}
+.ggm{background:#FAEEDA;border-color:#BA7517;color:#633806}
+.ggh{background:#FCEBEB;border-color:#E24B4A;color:#A32D2D}
+.sig-box{border:.5px dashed #ccc;border-radius:8px;height:90px;display:flex;align-items:center;justify-content:center;cursor:crosshair;position:relative;overflow:hidden}
+.sig-box canvas{position:absolute;inset:0;width:100%;height:100%}
+.sig-hint{font-size:.78rem;color:#aaa;pointer-events:none}
+.stamp-btn{padding:.33rem .48rem;border-radius:6px;border:.5px solid #1a3a6b;background:#1a3a6b;color:#fff;cursor:pointer;font-size:.82rem;display:flex;align-items:center;flex-shrink:0}
+.stamp-btn.done{background:#f0f4fb;border-color:#1a3a6b;color:#1a3a6b}
+.btn{padding:.48rem .95rem;border-radius:6px;font-size:.83rem;cursor:pointer;border:.5px solid #ccc;background:#fff;color:#111;display:inline-flex;align-items:center;gap:5px}
+.btn:hover{background:#f5f5f5}
+.btnp{background:#1a3a6b;color:#fff;border-color:#1a3a6b}.btnp:hover{background:#14305a}
+.btnd{border-color:#E24B4A;color:#A32D2D}.btnd:hover{background:#FCEBEB}
+.btng{border-color:#2e7d32;color:#2e7d32}.btng:hover{background:#e8f5e9}
+.btnw{border-color:#f39c12;color:#b7770d}.btnw:hover{background:#fff8e1}
+.benc{background:#6c3483;color:#fff}
+.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:.5rem}
+.locked-banner{background:#fff3e0;border:.5px solid #f39c12;border-radius:8px;padding:.7rem 1rem;display:flex;align-items:center;gap:8px;font-size:.82rem;color:#b7770d;margin-bottom:.9rem}
+.func-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.func-card{background:#fff;border:.5px solid #ddd;border-radius:10px;padding:.9rem;display:flex;flex-direction:column;align-items:center;gap:.4rem;position:relative}
+.func-card.inativo{opacity:.45;filter:grayscale(1)}
+.f-av{width:56px;height:56px;border-radius:50%;background:#e6f1fb;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1.15rem;color:#185FA5;overflow:hidden;cursor:pointer;border:2px dashed #b5d4f4}
+.f-av img{width:100%;height:100%;object-fit:cover}
+.fdel{position:absolute;top:6px;right:6px;background:none;border:none;color:#bbb;cursor:pointer;font-size:.9rem;padding:2px}
+.fdel:hover{color:#E24B4A}
+.add-card{background:#f5f5f5;border:.5px dashed #ccc;border-radius:10px;padding:1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;cursor:pointer;min-height:130px}
+.add-card:hover{background:#fff;border-color:#1a3a6b}
+.add-card i{font-size:1.6rem;color:#1a3a6b;opacity:.6}
+.f-form{background:#f5f5f5;border:.5px solid #ddd;border-radius:10px;padding:1.1rem;margin-bottom:.9rem;display:none}
+.f-form.open{display:block}
+.av-up{width:64px;height:64px;border-radius:50%;background:#e6f1fb;border:2px dashed #b5d4f4;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;margin:0 auto .65rem}
+.av-up img{width:100%;height:100%;object-fit:cover;display:none}
+.bib-list{display:flex;flex-direction:column;gap:5px;margin-bottom:9px}
+.bib-item{display:flex;align-items:center;gap:7px;padding:.5rem .7rem;border:.5px solid #ddd;border-radius:8px;background:#fff}
+.bib-name{flex:1;font-size:.875rem}
+.bib-edit{display:none;flex:1}
+.bib-edit input{font-size:.875rem;padding:.26rem .55rem;border:.5px solid #ccc;border-radius:6px;width:100%;background:#fff;color:#111}
+.bib-add{display:flex;gap:7px}
+.bib-add input{flex:1;font-size:.875rem;padding:.46rem .7rem;border:.5px solid #ccc;border-radius:6px;background:#fff;color:#111}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:150;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:460px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-hdr{padding:.85rem 1.1rem;border-bottom:.5px solid #ddd;display:flex;align-items:center;justify-content:space-between}
+.modal-hdr h2{font-size:.93rem;font-weight:600}
+.modal-body{overflow-y:auto;padding:.9rem}
+.pick-item{display:flex;align-items:center;gap:10px;padding:.65rem;border-radius:8px;cursor:pointer;border:.5px solid transparent}
+.pick-item:hover{background:#f5f5f5;border-color:#ddd}
+.pick-av{width:36px;height:36px;border-radius:50%;background:#e6f1fb;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.85rem;color:#185FA5;flex-shrink:0;overflow:hidden}
+.pick-av img{width:100%;height:100%;object-fit:cover}
+.view-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
+.view-overlay.open{display:flex}
+.view-modal{background:#fff;border-radius:12px;width:100%;max-width:720px;margin:auto;overflow:hidden}
+.view-bar{background:#1a3a6b;color:#fff;padding:.85rem 1.2rem;display:flex;align-items:center;justify-content:space-between}
+.view-bar h2{font-size:.95rem;font-weight:600}
+.vc{padding:1.2rem}
+.vhbox{display:flex;align-items:center;gap:1rem;background:#f0f4fb;border-radius:10px;padding:.9rem;margin-bottom:.9rem}
+.vlogo{background:#111;color:#fff;font-weight:700;font-size:.95rem;padding:.32rem .75rem;border-radius:6px;letter-spacing:1px}
+.vsec{margin-bottom:.9rem}
+.vstitle{font-size:.72rem;font-weight:700;color:#1a3a6b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem;padding-bottom:.35rem;border-bottom:.5px solid #e0e8f5}
+.vg2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.vg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.vf{display:flex;flex-direction:column;gap:2px}
+.vl{font-size:.7rem;color:#888}
+.vv{font-size:.85rem;font-weight:500;color:#111}
+.vp{border:.5px solid #ddd;border-radius:7px;padding:.65rem;margin-bottom:.45rem;background:#fafafa}
+.vptitle{font-size:.76rem;font-weight:600;color:#1a3a6b;margin-bottom:.45rem}
+.gbadge{display:inline-block;font-size:.73rem;padding:2px 9px;border-radius:4px;font-weight:600}
+.gn{background:#f0f0f0;color:#666}.glo{background:#eaf3de;color:#3B6D11}.gme{background:#FAEEDA;color:#633806}.ghi{background:#FCEBEB;color:#A32D2D}
+.view-sig img{max-width:260px;border:.5px solid #ddd;border-radius:6px}
+.view-actions{display:flex;gap:8px;justify-content:flex-end;padding:.9rem 1.2rem;border-top:.5px solid #eee}
+.rep-card{background:#fff;border:.5px solid #ddd;border-radius:10px;padding:.85rem 1.1rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem}
+.rep-meta{font-size:.77rem;color:#666;margin-top:2px}
+.rep-num{font-size:.72rem;background:#e6f1fb;color:#185FA5;padding:2px 7px;border-radius:4px;font-weight:600}
+.rep-lock{font-size:.7rem;background:#fff3e0;color:#b7770d;padding:2px 7px;border-radius:4px;font-weight:600;display:inline-flex;align-items:center;gap:3px}
+.empty-st{text-align:center;padding:2.5rem 1rem;color:#888}
+.empty-st i{font-size:2.2rem;margin-bottom:.5rem;display:block;opacity:.4}
+.sync-bar{background:#fff3e0;color:#b7770d;font-size:.78rem;padding:.45rem 1rem;display:flex;align-items:center;gap:6px;border-bottom:.5px solid #ffe0b2}
+.sync-bar.online{background:#e8f5e9;color:#2e7d32}
+.sync-bar.hidden{display:none}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1a3a6b;color:#fff;padding:.65rem 1.1rem;border-radius:8px;font-size:.83rem;display:none;z-index:400;align-items:center;gap:6px}
+@media print{body>*:not(#printArea){display:none!important}#printArea{display:block!important;position:fixed;inset:0;background:#fff;padding:1.5rem;z-index:9999;overflow:auto}}
+#printArea{display:none}
+@media(max-width:540px){.g2,.g3,.g4,.vg2,.vg3{grid-template-columns:1fr 1fr}.grav-btns{flex-wrap:wrap}}
+@media(max-width:380px){.g2,.g3,.g4,.vg2,.vg3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo"><div class="logo-big">CARSTRAN</div><p>Relatório Diário de Serviços</p></div>
+    <div class="lfield"><label>Funcionário</label><select id="loginUser"><option value="">Selecione...</option></select></div>
+    <div class="lfield"><label>Senha</label><input type="password" id="loginPass" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn-login" onclick="doLogin()"><i class="ti ti-login"></i> Entrar</button>
+    <div class="login-err" id="loginErr"></div>
+    <div class="recov-link"><button onclick="toggleRecov()">Esqueci a senha do administrador</button></div>
+    <div class="recov-box" id="recovBox">
+      <div class="lfield"><label>Nova senha</label><input type="password" id="recovNova" placeholder="Nova senha"></div>
+      <div class="lfield"><label>Confirmar senha</label><input type="password" id="recovConf" placeholder="Repita a senha"></div>
+      <div class="recov-err" id="recovErr"></div>
+      <button class="btn-login" style="font-size:.85rem;padding:.6rem" onclick="salvarNovaSenha()">Salvar nova senha</button>
+      <p style="font-size:.72rem;color:#aaa;margin-top:.5rem;text-align:center">Código: <strong>CARSTRAN2024</strong></p>
+    </div>
+  </div>
+</div>
+
+<div id="appRoot" style="display:none">
+  <div class="sync-bar hidden" id="syncBar"></div>
+  <div class="header">
+    <div class="logo-box">CARSTRAN</div>
+    <div class="header-info"><h1>Relatório Diário de Serviços</h1><p id="headerDate"></p></div>
+    <div class="header-user"><span class="ubadge" id="userBadge"></span><button class="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i></button></div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" id="tabNovo" onclick="showTab('novo')"><i class="ti ti-file-plus"></i> Relatório<i class="ti ti-lock lock-icon" id="lockNovo"></i></div>
+    <div class="nav-tab" id="tabFunc" onclick="showTab('funcionarios')"><i class="ti ti-users"></i> Funcionários<i class="ti ti-lock lock-icon" id="lockFunc"></i></div>
+    <div class="nav-tab" id="tabBib" onclick="showTab('bibliotecas')"><i class="ti ti-books"></i> Bibliotecas<i class="ti ti-lock lock-icon" id="lockBib"></i></div>
+    <div class="nav-tab" onclick="showTab('historico')"><i class="ti ti-history"></i> Histórico</div>
+  </div>
+
+  <div id="tab-novo" class="content">
+    <div id="lockedNotice" class="locked-banner" style="display:none"><i class="ti ti-lock"></i> Relatório finalizado. Somente o administrador pode editar.</div>
+    <div class="section"><div class="stitle"><i class="ti ti-file-description"></i> Identificação</div>
+      <div class="g2"><div class="field"><label>Nº do relatório</label><input type="text" id="numRel" readonly></div><div class="field"><label>Data</label><input type="date" id="dataRel" onchange="refreshDateTags()"></div></div>
+    </div>
+    <div class="section"><div class="stitle"><i class="ti ti-user"></i> Motorista e veículo</div>
+      <div id="motoristaSel" class="sel-box" onclick="openFuncModal()" style="margin-bottom:9px">
+        <div class="m-av" id="selAvatar"><i class="ti ti-user" style="font-size:1.05rem;color:#185FA5"></i></div>
+        <div style="flex:1"><div style="color:#aaa;font-size:.875rem" id="selPlaceholder">Selecionar motorista...</div><div style="font-size:.88rem;font-weight:500;display:none" id="selNome"></div><div style="font-size:.75rem;color:#666;display:none" id="selCargo"></div></div>
+        <i class="ti ti-chevron-down" style="color:#666"></i>
+      </div>
+      <div class="g2"><div class="field"><label>Placa</label><select id="placa" onchange="autoVeiculo()"><option value="">Selecione...</option></select></div><div class="field"><label>Tipo de veículo</label><input type="text" id="tipoVeiculoAuto" readonly placeholder="Preenchido pela placa"></div></div>
+    </div>
+    <div class="section"><div class="stitle"><i class="ti ti-clock"></i> Horário e KM</div>
+      <div class="g4">
+        <div class="field"><label>Hora inicial</label><div style="display:flex;gap:5px"><input type="time" id="horIni" onchange="refreshDateTags();calcHorTotal()" style="flex:1"><button class="stamp-btn" id="sbtnHI" onclick="stampTime('horIni','sbtnHI')"><i class="ti ti-player-play"></i></button></div></div>
+        <div class="field"><label>KM inicial</label><input type="number" id="kmIni" placeholder="0" oninput="calcKmTotal();calcConsumo()"></div>
+        <div class="field"><label>Hora final</label><div style="display:flex;gap:5px"><input type="time" id="horFim" onchange="refreshDateTags();calcHorTotal()" style="flex:1"><button class="stamp-btn" id="sbtnHF" onclick="stampTime('horFim','sbtnHF')"><i class="ti ti-player-stop"></i></button></div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.74rem;color:#555;margin-top:5px;cursor:pointer"><input type="checkbox" id="horFimProxDia" onchange="refreshDateTags();calcHorTotal()" style="width:auto"> Terminou no dia seguinte</label>
+        </div>
+        <div class="field"><label>KM final</label><input type="number" id="kmFim" placeholder="0" oninput="calcKmTotal();calcConsumo()"></div>
+      </div>
+      <div class="g3" style="margin-top:9px"><div class="field"><label>Total horas</label><input type="text" id="totalHoras" readonly placeholder="Automático"></div><div class="field"><label>Total KM</label><input type="text" id="totalKm" readonly placeholder="Automático"></div><div class="field"><label>Consumo médio</label><input type="text" id="consumoMedio" readonly placeholder="Automático"></div></div>
+    </div>
+    <div class="section"><div class="stitle"><i class="ti ti-map-pin"></i> Rotas e horários</div>
+      <div id="paradasContainer"></div>
+      <div id="resumoBox" style="display:none;margin-top:.5rem">
+        <div class="stitle" style="margin-bottom:.5rem"><i class="ti ti-chart-bar"></i> Resumo</div>
+        <div class="res-grid"><div class="res-card"><div class="res-label">Total rota</div><div class="res-val" id="resTotalRota">—</div></div><div class="res-card"><div class="res-label">Total parado</div><div class="res-val" id="resTotalParado">—</div></div><div class="res-card"><div class="res-label">Total dia</div><div class="res-val" id="resTotalDia">—</div></div></div>
+      </div>
+    </div>
+    <div class="section"><div class="stitle"><i class="ti ti-package"></i> Carga</div>
+      <div class="g2"><div class="field"><label>Tipo de carga</label><select id="tipoCarga"><option value="">Selecione...</option></select></div><div class="field"><label>Nota fiscal</label><input type="text" id="nf" placeholder="Número da NF"></div><div class="field"><label>Peso (kg)</label><input type="number" id="peso" placeholder="0"></div><div class="field"><label>Volume (m³)</label><input type="number" id="volume" placeholder="0"></div></div>
+    </div>
+    <div class="section"><div class="stitle"><i class="ti ti-gas-station"></i> Abastecimento</div>
+      <div class="g3"><div class="field"><label>Diesel (L)</label><input type="number" id="diesel" placeholder="0" step="0.01" oninput="calcConsumo()"></div><div class="field"><label>Arla (L)</label><input type="number" id="arla" placeholder="0" step="0.01"></div><div class="field"><label>Local</label><select id="localAbast"><option value="">Selecione...</option></select></div></div>
+    </div>
+    <div class="section"><div class="stitle"><i class="ti ti-alert-triangle"></i> Ocorrências</div>
+      <div class="field" style="margin-bottom:9px"><label>Descrição</label><textarea id="ocorrencia" placeholder="Descreva qualquer problema..."></textarea></div>
+      <div class="field"><label>Gravidade</label><div class="grav-btns"><button class="grav-btn" id="gbNone" onclick="setGrav('none')">Nenhuma</button><button class="grav-btn" id="gbLow" onclick="setGrav('low')">Baixa</button><button class="grav-btn" id="gbMed" onclick="setGrav('med')">Média</button><button class="grav-btn" id="gbHigh" onclick="setGrav('high')">Alta</button></div></div>
+    </div>
+    <div class="section"><div class="stitle"><i class="ti ti-writing"></i> Assinatura do funcionário</div>
+      <div class="field" style="margin-bottom:8px"><label>Nome</label><input type="text" id="nomeCliente" readonly></div>
+      <div class="sig-box" id="sigBox"><canvas id="sigCanvas"></canvas><span class="sig-hint" id="sigHint">Assine aqui</span></div>
+      <div style="margin-top:7px"><button class="btn btnd btnsm" onclick="clearSig()"><i class="ti ti-trash"></i> Limpar</button></div>
+    </div>
+    <div class="actions" id="formActions"><button class="btn btnsm" onclick="clearForm()"><i class="ti ti-refresh"></i> Limpar</button><button class="btn btnp btnsm" onclick="saveReport()"><i class="ti ti-device-floppy"></i> Salvar</button></div>
+  </div>
+
+  <div id="tab-funcionarios" class="content" style="display:none">
+    <div id="funcForm" class="f-form">
+      <div class="stitle"><i class="ti ti-user-plus"></i> Novo funcionário</div>
+      <div class="av-up" id="avUp" onclick="document.getElementById('avInput').click()"><img id="avPrev"><i class="ti ti-camera" id="avIcon" style="font-size:1.6rem;color:#185FA5"></i></div>
+      <input type="file" id="avInput" accept="image/*" style="display:none" onchange="previewAv(this)">
+      <div class="g2" style="margin-bottom:9px"><div class="field"><label>Nome completo</label><input type="text" id="fNome" placeholder="Nome"></div><div class="field"><label>Cargo</label><select id="fCargo"><option value="">Selecione...</option></select></div></div>
+      <div class="g2" style="margin-bottom:9px"><div class="field"><label>Senha</label><input type="password" id="fSenha" placeholder="Senha"></div><div class="field"><label>Tipo</label>  <select id="fTipo" onchange="toggleEncPermissoes()"><option value="func">Funcionário</option><option value="encarregado">Encarregado</option><option value="admin">Administrador</option></select></div></div>
+      <div id="encPermBox" style="display:none;margin-bottom:9px">
+        <div class="field"><label id="encPermLabel">Permissões</label>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="permVer" checked> Ver relatórios</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="permVistar"> Dar visto</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="permRessalvar"> Adicionar ressalvas</label>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btnsm" onclick="closeFuncForm()"><i class="ti ti-x"></i> Cancelar</button><button class="btn btnp btnsm" onclick="saveFunc()"><i class="ti ti-check"></i> Salvar</button></div>
+    </div>
+    <div class="section"><div class="stitle"><i class="ti ti-users"></i> Equipe</div>
+      <div style="margin-bottom:.75rem"><input type="text" id="searchFunc" placeholder="🔍 Pesquisar por nome..." oninput="renderFuncGrid()" style="width:100%;font-size:.875rem;padding:.48rem .75rem;border:.5px solid #ccc;border-radius:8px;background:#fff;color:#111"></div>
+      <div class="func-grid" id="funcGrid"></div>
+    </div>
+  </div>
+
+  <div id="tab-bibliotecas" class="content" style="display:none">
+    <div class="section"><div class="stitle"><i class="ti ti-briefcase"></i> Cargos</div><div class="bib-list" id="listCargos"></div><div class="bib-add"><input type="text" id="novoCargo" placeholder="Novo cargo..."><button class="btn btnp btnsm" onclick="addCargo()"><i class="ti ti-plus"></i></button></div></div>
+    <div class="section"><div class="stitle"><i class="ti ti-truck"></i> Tipos de veículo</div><div class="bib-list" id="listVeiculos"></div><div class="bib-add"><input type="text" id="novoVeiculo" placeholder="Novo tipo..."><button class="btn btnp btnsm" onclick="addBib('tiposVeiculo','novoVeiculo')"><i class="ti ti-plus"></i></button></div></div>
+    <div class="section"><div class="stitle"><i class="ti ti-package"></i> Tipos de carga</div><div class="bib-list" id="listCargas"></div><div class="bib-add"><input type="text" id="novaCarga" placeholder="Novo tipo..."><button class="btn btnp btnsm" onclick="addBib('tiposCarga','novaCarga')"><i class="ti ti-plus"></i></button></div></div>
+    <div class="section"><div class="stitle"><i class="ti ti-map-pin"></i> Locais de abastecimento</div><div class="bib-list" id="listPostos"></div><div class="bib-add"><input type="text" id="novoPost" placeholder="Nome do posto..."><button class="btn btnp btnsm" onclick="addBib('postos','novoPost')"><i class="ti ti-plus"></i></button></div></div>
+    <div class="section"><div class="stitle"><i class="ti ti-license"></i> Placas</div><div class="bib-list" id="listPlacas"></div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:4px">
+        <input type="text" id="novaPlaca" placeholder="Placa (ABC-1234)" style="flex:1;min-width:105px;font-size:.875rem;padding:.46rem .68rem;border:.5px solid #ccc;border-radius:6px;background:#fff;color:#111">
+        <select id="novaPlacaTipo" style="flex:1;min-width:105px;font-size:.875rem;padding:.46rem .68rem;border:.5px solid #ccc;border-radius:6px;background:#fff;color:#111"><option value="">Tipo...</option></select>
+        <button class="btn btnp btnsm" onclick="addPlaca()"><i class="ti ti-plus"></i> Add</button>
+      </div>
+    </div>
+    <div class="section"><div class="stitle"><i class="ti ti-database"></i> Backup</div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn btng btnsm" onclick="exportBackup()"><i class="ti ti-download"></i> Exportar</button><button class="btn btnp btnsm" onclick="document.getElementById('importFile').click()"><i class="ti ti-upload"></i> Importar</button><input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(this)"></div>
+    </div>
+  </div>
+
+  <div id="tab-historico" class="content" style="display:none">
+    <div class="section"><div class="stitle"><i class="ti ti-history"></i> Relatórios salvos</div><div id="reportList"></div></div>
+  </div>
+</div>
+
+<!-- Modal visto encarregado -->
+<!-- Modal editar funcionário -->
+<div class="modal-bg" id="editFuncModal" onclick="if(event.target===this)closeEditFunc()">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-hdr"><h2>Editar funcionário</h2><button class="btn btnsm" onclick="closeEditFunc()"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="g2" style="margin-bottom:9px">
+        <div class="field"><label>Nome completo</label><input type="text" id="editNome" placeholder="Nome"></div>
+        <div class="field"><label>Cargo</label><select id="editCargo"><option value="">Selecione...</option></select></div>
+      </div>
+      <div class="g2" style="margin-bottom:9px">
+        <div class="field"><label>Tipo de acesso</label>
+          <select id="editTipo" onchange="toggleEditPermissoes()">
+            <option value="func">Funcionário</option>
+            <option value="encarregado">Encarregado</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="field"><label>Nova senha (opcional)</label><input type="password" id="editSenha" placeholder="Deixe vazio para manter"></div>
+      </div>
+      <div id="editPermBox" style="display:none;margin-bottom:9px">
+        <div class="field"><label id="editPermLabel">Permissões</label>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="editPermVer"> Ver relatórios</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="editPermVistar"> Dar visto</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="editPermRessalvar"> Adicionar ressalvas</label>
+          </div>
+        </div>
+      </div>
+      <div id="editErr" style="color:#c0392b;font-size:.78rem;margin-bottom:6px;display:none"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+        <button class="btn btnsm" onclick="closeEditFunc()"><i class="ti ti-x"></i> Cancelar</button>
+        <button class="btn btnp btnsm" onclick="salvarEdicaoFunc()"><i class="ti ti-check"></i> Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="vistoModal" onclick="if(event.target===this)closeVistoModal()">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-hdr"><h2>Visto do encarregado</h2><button class="btn btnsm" onclick="closeVistoModal()"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <p style="font-size:.82rem;color:#666;margin-bottom:1rem">Selecione o status e, se necessário, adicione ressalvas.</p>
+      <div class="field" style="margin-bottom:10px"><label>Status</label>
+        <select id="vistoStatus">
+          <option value="ok">✅ OK — Aprovado</option>
+          <option value="ressalvas">⚠️ Verificado com ressalvas</option>
+        </select>
+      </div>
+      <div id="vistoRessalvasBox" style="display:none">
+        <div class="field" style="margin-bottom:10px"><label>Ressalvas</label>
+          <textarea id="vistoRessalvas" placeholder="Descreva as ressalvas..." style="min-height:80px;resize:vertical;font-size:.875rem;padding:.48rem .7rem;border:.5px solid #ccc;border-radius:6px;width:100%"></textarea>
+        </div>
+      </div>
+      <div id="vistoErr" style="color:#c0392b;font-size:.78rem;margin-bottom:6px;display:none"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+        <button class="btn btnsm" onclick="closeVistoModal()"><i class="ti ti-x"></i> Cancelar</button>
+        <button class="btn btnp btnsm" onclick="confirmarVisto()"><i class="ti ti-check"></i> Confirmar visto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="passModal" onclick="if(event.target===this)closePassModal()">
+  <div class="modal" style="max-width:340px">
+    <div class="modal-hdr"><h2 id="passModalTitle">Alterar senha</h2><button class="btn btnsm" onclick="closePassModal()"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="field" style="margin-bottom:10px"><label>Nova senha</label><input type="password" id="passModalInput" placeholder="Nova senha"></div>
+      <div class="field"><label>Confirmar senha</label><input type="password" id="passModalConfirm" placeholder="Repita a senha"></div>
+      <div id="passModalErr" style="color:#c0392b;font-size:.78rem;margin-top:6px;display:none"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button class="btn btnsm" onclick="closePassModal()"><i class="ti ti-x"></i> Cancelar</button><button class="btn btnp btnsm" onclick="confirmPassModal()"><i class="ti ti-check"></i> Salvar</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="funcModal" onclick="if(event.target===this)closeFuncModal()">
+  <div class="modal"><div class="modal-hdr"><h2>Selecionar motorista</h2><button class="btn btnsm" onclick="closeFuncModal()"><i class="ti ti-x"></i></button></div><div class="modal-body" id="funcModalBody"></div></div>
+</div>
+
+<div class="view-overlay" id="viewOverlay" onclick="if(event.target===this)closeView()">
+  <div class="view-modal">
+    <div class="view-bar"><h2 id="viewTitle">Relatório</h2><button class="btn btnsm" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);color:#fff" onclick="closeView()"><i class="ti ti-x"></i></button></div>
+    <div class="vc" id="viewContent"></div>
+    <div class="view-actions" id="viewActions"></div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// ÚNICA fonte de verdade: localStorage direto em tudo
+// ============================================================
+function LS(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+function SV(k,v){localStorage.setItem(k,JSON.stringify(v));}
+
+var R  = LS('ct_reports')  || [];
+var F  = LS('ct_funcs')    || [];
+var C  = LS('ct_cargos')   || ['Motorista','Ajudante','Supervisor','Conferente'];
+var LV = LS('ct_tiposVeiculo') || ['Truck','Carreta','Bitrem','VUC','Toco','Van','Utilitário'];
+var LC = LS('ct_tiposCarga')   || ['Carga geral','Frigorificada','Granel','Perigosa','Indivisível'];
+var LP = LS('ct_placas')   || [];
+var LO = LS('ct_postos')   || [];
+
+// garante sempre ao menos um admin ativo
+if(!F.some(function(f){return f.tipo==='admin'&&!f.inativo;})){
+  F.unshift({nome:'Administrador',cargo:'Administrador',tipo:'admin',senha:'admin123',foto:null,inativo:false});
+  SV('ct_funcs',F);
+  // avisa que admin foi recriado
+  setTimeout(function(){
+    var err=document.getElementById('loginErr');
+    if(err){err.textContent='Admin recriado com senha padrão: admin123';err.style.display='block';err.style.color='#b7770d';}
+  },300);
+}
+
+var CU=null,grav='none',SF=null,newAv=null,sigDraw=false,sigCtx,sigCv,sigBx,CVR=null,formLocked=false,editPI=-1,editFuncIdx=-1,pickerAtivos=[];
+var PARADAS=[{l:'1ª parada',o:'Garagem',d:'Fazenda'},{l:'2ª parada',o:'Fazenda',d:'Garagem'},{l:'3ª parada',o:'Garagem',d:'Fábrica'},{l:'4ª parada',o:'Fábrica',d:'Garagem'}];
+
+function pad(n){return String(n).padStart(2,'0');}
+function toMin(t){if(!t)return null;var p=t.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
+function mStr(m){if(m===null||isNaN(m)||m<0)return'—';return Math.floor(m/60)+'h '+pad(m%60)+'min';}
+function fmtD(d){if(!d)return'';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function inits(n){var p=n.trim().split(' ');return(p[0][0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase();}
+function isAdm(){return CU&&CU.tipo==='admin'&&CU.nome==='Administrador';}
+function isAdmExec(){return CU&&CU.tipo==='admin'&&CU.nome!=='Administrador';}
+function isEnc(){return CU&&CU.tipo==='encarregado';}
+function isSup(){return isAdmExec()||isEnc();}
+function temPerm(p){
+  if(isAdm())return true;
+  if((isAdmExec()||isEnc())&&CU.perms)return CU.perms[p]===true;
+  return false;
+}
+function podeVer(){return isAdm()||temPerm('ver');}
+function podeVistar(){return isAdm()||temPerm('vistar');}
+function podeRessalvar(){return isAdm()||temPerm('ressalvar');}
+function podeGerenciar(){return isAdm();}
+function podeIniciar(){return isAdm()||(CU&&CU.tipo==='func');}
+function sA(a){return a.slice().sort(function(x,y){return x.localeCompare(y,'pt-BR',{sensitivity:'base'});});}
+function sAO(a,k){return a.slice().sort(function(x,y){return x[k].localeCompare(y[k],'pt-BR',{sensitivity:'base'});});}
+function nextNum(){var yr=new Date().getFullYear();var s=R.filter(function(r){return r.num&&r.num.indexOf('-'+yr)>=0;});return 'CS-'+String(s.length+1).padStart(4,'0')+'-'+yr;}
+function toast(msg,t){var el=document.getElementById('toast');el.innerHTML=(t==='ok'?'<i class="ti ti-check"></i> ':'<i class="ti ti-alert-circle"></i> ')+msg;el.style.display='flex';el.style.background=t==='ok'?'#1a3a6b':'#c0392b';setTimeout(function(){el.style.display='none';},3200);}
+function imgOrInit(f){return(f.foto&&f.foto.length>10)?'<img src="'+f.foto+'" onerror="this.style.display=\'none\'">':inits(f.nome);}
+
+// conn
+function updConn(){var b=document.getElementById('syncBar');if(!b)return;if(navigator.onLine){b.className='sync-bar online';b.innerHTML='<i class="ti ti-wifi"></i> Online';setTimeout(function(){b.className='sync-bar hidden';},2000);}else{b.className='sync-bar';b.innerHTML='<i class="ti ti-wifi-off"></i> Offline';}}
+window.addEventListener('online',updConn);window.addEventListener('offline',updConn);
+
+// recuperação
+function toggleRecov(){var b=document.getElementById('recovBox');b.style.display=b.style.display==='none'?'block':'none';document.getElementById('recovNova').value='';document.getElementById('recovConf').value='';document.getElementById('recovErr').style.display='none';}
+function salvarNovaSenha(){
+  var err=document.getElementById('recovErr');err.style.display='none';
+  var nova=document.getElementById('recovNova').value.trim();
+  var conf=document.getElementById('recovConf').value.trim();
+  if(!nova){err.textContent='Digite a nova senha!';err.style.display='block';return;}
+  if(nova!==conf){err.textContent='As senhas não coincidem!';err.style.display='block';return;}
+  var fs=LS('ct_funcs')||[];var found=false;
+  for(var i=0;i<fs.length;i++){if(fs[i].tipo==='admin'){fs[i].senha=nova;found=true;break;}}
+  if(!found){fs.unshift({nome:'Administrador',cargo:'Administrador',tipo:'admin',senha:nova,foto:null,inativo:false});}
+  SV('ct_funcs',fs);F=fs;buildLoginUsers();
+  document.getElementById('recovBox').style.display='none';
+  toast('Senha redefinida! Faça login.','ok');
+}
+
+// auth
+// ===== VISTO =====
+var vistoRepId=null;
+function getVistos(r){
+  if(r.vistos&&r.vistos.length)return r.vistos;
+  if(r.visto)return [{nome:r.visto.encarregado,cargo:r.visto.cargo,status:r.visto.status,ressalvas:r.visto.ressalvas,data:r.visto.data}];
+  return [];
+}
+function meuVisto(r){if(!CU)return null;var vs=getVistos(r);for(var i=0;i<vs.length;i++){if(vs[i].nome===CU.nome)return vs[i];}return null;}
+function vistoResumo(r){var vs=getVistos(r);if(!vs.length)return null;return vs.some(function(v){return v.status==='ressalvas';})?'ressalvas':'ok';}
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='vistoStatus'){document.getElementById('vistoRessalvasBox').style.display=e.target.value==='ressalvas'?'block':'none';}});
+function abrirVisto(id){
+  vistoRepId=id;
+  var r=R.find(function(x){return x.id===id;});
+  var mine=r?meuVisto(r):null;
+  if(mine){
+    document.getElementById('vistoStatus').value=mine.status;
+    document.getElementById('vistoRessalvas').value=mine.ressalvas||'';
+    document.getElementById('vistoRessalvasBox').style.display=mine.status==='ressalvas'?'block':'none';
+  } else {
+    document.getElementById('vistoStatus').value='ok';
+    document.getElementById('vistoRessalvas').value='';
+    document.getElementById('vistoRessalvasBox').style.display='none';
+  }
+  // se não tem permissão de ressalvar, esconde opção de ressalvas
+  var optRes=document.querySelector('#vistoStatus option[value="ressalvas"]');
+  if(optRes) optRes.style.display=podeRessalvar()?'':'none';
+  document.getElementById('vistoErr').style.display='none';
+  document.getElementById('vistoModal').classList.add('open');
+}
+function closeVistoModal(){document.getElementById('vistoModal').classList.remove('open');vistoRepId=null;}
+function confirmarVisto(){
+  var status=document.getElementById('vistoStatus').value;
+  var ressalvas=document.getElementById('vistoRessalvas').value.trim();
+  if(status==='ressalvas'&&!ressalvas){document.getElementById('vistoErr').textContent='Descreva as ressalvas!';document.getElementById('vistoErr').style.display='block';return;}
+  for(var i=0;i<R.length;i++){
+    if(R[i].id===vistoRepId){
+      if(!R[i].vistos)R[i].vistos=getVistos(R[i]).slice();
+      var mine=null;
+      for(var j=0;j<R[i].vistos.length;j++){if(R[i].vistos[j].nome===CU.nome){mine=R[i].vistos[j];break;}}
+      // se essa pessoa já deu o visto dela, só o admin geral pode alterar
+      if(mine&&!isAdm()){toast('Você já deu seu visto. Somente o administrador pode modificar.','w');closeVistoModal();return;}
+      var data=new Date().toLocaleString('pt-BR');
+      if(mine){mine.status=status;mine.ressalvas=ressalvas;mine.data=data;mine.cargo=CU.cargo;}
+      else{R[i].vistos.push({nome:CU.nome,cargo:CU.cargo,status:status,ressalvas:ressalvas,data:data});}
+      // mantém campo antigo (compatibilidade com o card resumido da lista)
+      R[i].visto={status:status,ressalvas:ressalvas,encarregado:CU.nome,cargo:CU.cargo,data:data,dado:true};
+      if(!R[i].vistoHistorico)R[i].vistoHistorico=[];
+      R[i].vistoHistorico.push({encarregado:CU.nome,cargo:CU.cargo,status:status,ressalvas:ressalvas,data:data});
+      break;
+    }
+  }
+  SV('ct_reports',R);closeVistoModal();renderHistory();
+  toast('Visto registrado!','ok');
+}
+
+function registrarVisualizacao(id){
+  for(var i=0;i<R.length;i++){
+    if(R[i].id===id){
+      if(!R[i].visualizacoes)R[i].visualizacoes=[];
+      R[i].visualizacoes.push({nome:CU.nome,tipo:CU.tipo,data:new Date().toLocaleString('pt-BR')});
+      SV('ct_reports',R);
+      break;
+    }
+  }
+}
+
+function buildLoginUsers(){var sel=document.getElementById('loginUser');sel.innerHTML='<option value="">Selecione...</option>';F.forEach(function(f,i){if(f.inativo)return;var o=document.createElement('option');o.value=i;o.textContent=f.nome+(f.tipo==='admin'?' ★':'');sel.appendChild(o);});}
+function doLogin(){
+  var idx=document.getElementById('loginUser').value,pass=document.getElementById('loginPass').value,err=document.getElementById('loginErr');
+  if(idx===''){err.textContent='Selecione um funcionário.';err.style.display='block';return;}
+  var f=F[parseInt(idx)];
+  if(!f||f.senha!==pass){err.textContent='Senha incorreta.';err.style.display='block';return;}
+  CU=f;document.getElementById('loginScreen').classList.add('hidden');document.getElementById('appRoot').style.display='block';document.getElementById('loginPass').value='';err.style.display='none';applyRole();init();updConn();
+}
+function doLogout(){CU=null;formLocked=false;document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('appRoot').style.display='none';buildLoginUsers();showTab('novo');}
+function applyRole(){
+  var a=isAdm(),ae=isAdmExec(),e=isEnc();
+  var b=document.getElementById('userBadge');
+  if(a) b.textContent=CU.nome+' (Admin Geral)';
+  else if(ae) b.textContent=CU.nome+' (Admin)';
+  else if(e) b.textContent=CU.nome+' (Encarregado)';
+  else b.textContent=CU.nome;
+  b.className='ubadge '+(a?'badmin':ae?'badminexec':e?'benc':'bfunc');
+  // só admin geral acessa Funcionários e Bibliotecas
+  var podeG=podeGerenciar();
+  document.getElementById('lockFunc').style.display=podeG?'none':'';
+  document.getElementById('lockBib').style.display=podeG?'none':'';
+  document.getElementById('tabFunc').style.opacity=podeG?'1':'0.5';
+  document.getElementById('tabBib').style.opacity=podeG?'1':'0.5';
+  // só admin geral e funcionários podem iniciar relatórios
+  var podeI=podeIniciar();
+  document.getElementById('lockNovo').style.display=podeI?'none':'';
+  document.getElementById('tabNovo').style.opacity=podeI?'1':'0.5';
+  showTab(podeI?'novo':'historico');
+}
+function checkLock(r){if(isAdm())return false;if(!r||!r.savedAt)return false;return(Date.now()-r.savedAt)>3600000;}
+function applyFormLock(l){formLocked=l;document.getElementById('lockedNotice').style.display=l?'flex':'none';document.querySelectorAll('#tab-novo input:not([type=file]),#tab-novo select,#tab-novo textarea').forEach(function(el){el.disabled=l;});document.getElementById('formActions').style.display=l?'none':'flex';document.getElementById('motoristaSel').style.pointerEvents=l?'none':'auto';document.querySelectorAll('.stamp-btn').forEach(function(b){b.disabled=l;});}
+function localDateStr(d){d=d||new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+
+function init(){var now=new Date();document.getElementById('headerDate').textContent=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});document.getElementById('dataRel').value=localDateStr(now);document.getElementById('numRel').value=nextNum();buildParadas();initSig();setGrav('none');refreshSels();applyFormLock(false);}
+
+var TIME_SEQ=['horIni','saida0','cheg0','saida1','cheg1','saida2','cheg2','saida3','cheg3','horFim'];
+function dayOffsets(){
+  var offsets={},dayOff=0,prevMin=null;
+  TIME_SEQ.forEach(function(fid){
+    var el=document.getElementById(fid),v=el?el.value:'';
+    if(!v){offsets[fid]=null;return;}
+    var m=toMin(v);
+    if(prevMin!==null&&m<prevMin)dayOff++;
+    offsets[fid]=dayOff;
+    prevMin=m;
+  });
+  // checkbox "Terminou no dia seguinte" reforça manualmente o horFim, se necessário
+  var chk=document.getElementById('horFimProxDia');
+  if(chk&&chk.checked&&offsets.horFim!==null){
+    var prevOff=0;
+    for(var i=TIME_SEQ.length-2;i>=0;i--){if(offsets[TIME_SEQ[i]]!==null){prevOff=offsets[TIME_SEQ[i]];break;}}
+    if(offsets.horFim<=prevOff)offsets.horFim=prevOff+1;
+  }
+  return offsets;
+}
+function refreshDateTags(){
+  var base=document.getElementById('dataRel').value;
+  var offs=dayOffsets();
+  TIME_SEQ.forEach(function(fid){
+    var el=document.getElementById(fid);
+    if(!el)return;
+    var lid='sd-'+fid,tag=document.getElementById(lid),off=offs[fid];
+    if(off===null||!base){if(tag)tag.remove();return;}
+    var d=new Date(base+'T00:00:00');
+    d.setDate(d.getDate()+off);
+    if(!tag){
+      tag=document.createElement('span');
+      tag.id=lid;
+      tag.style.cssText='font-size:.69rem;color:#185FA5;background:#e6f1fb;border-radius:4px;padding:1px 5px;display:inline-block;margin-top:2px;font-weight:500';
+      el.parentNode.parentNode.appendChild(tag);
+    }
+    tag.textContent=pad(d.getDate())+'/'+pad(d.getMonth()+1);
+  });
+}
+function stampTime(fid,bid){if(formLocked)return;var inp=document.getElementById(fid),btn=document.getElementById(bid),now=new Date();inp.value=pad(now.getHours())+':'+pad(now.getMinutes());refreshDateTags();btn.className='stamp-btn done';btn.innerHTML='<i class="ti ti-check"></i>';calcAll();if(fid==='horIni'||fid==='horFim')calcHorTotal();}
+function calcHorTotal(){
+  var s=toMin(document.getElementById('horIni').value),e=toMin(document.getElementById('horFim').value);
+  if(s===null||e===null){document.getElementById('totalHoras').value='';return;}
+  var offs=dayOffsets(),offFim=offs.horFim||0;
+  var diff=(e+offFim*1440)-s;
+  if(diff<0)diff=0;
+  document.getElementById('totalHoras').value=mStr(diff);
+}
+function calcKmTotal(){var a=parseFloat(document.getElementById('kmIni').value)||0,b=parseFloat(document.getElementById('kmFim').value)||0;document.getElementById('totalKm').value=b>a?(b-a)+' km':'';}
+function calcConsumo(){
+  var a=parseFloat(document.getElementById('kmIni').value)||0,b=parseFloat(document.getElementById('kmFim').value)||0;
+  var km=b>a?(b-a):0;
+  var diesel=parseFloat(document.getElementById('diesel').value)||0;
+  var el=document.getElementById('consumoMedio');
+  if(km>0&&diesel>0){el.value=(km/diesel).toFixed(2)+' km/L';}
+  else{el.value='';}
+}
+function lastKm(pl){for(var i=0;i<R.length;i++){if(R[i].placa===pl&&R[i].kmFim)return R[i].kmFim;}return'';}
+function autoVeiculo(){var v=document.getElementById('placa').value,parts=v.split('::'),pl=parts[0],tp=parts[1]||'';document.getElementById('tipoVeiculoAuto').value=tp;var lk=lastKm(pl);if(lk){document.getElementById('kmIni').value=lk;calcKmTotal();toast('KM inicial: '+lk,'ok');}}
+
+function buildParadas(){
+  var c=document.getElementById('paradasContainer');c.innerHTML='';
+  PARADAS.forEach(function(p,i){
+    var d=document.createElement('div');d.className='parada-card';
+    d.innerHTML='<div style="display:flex;align-items:center;gap:6px;margin-bottom:.65rem"><div class="p-num">'+(i+1)+'</div><span style="font-size:.82rem;font-weight:600;color:#1a3a6b">'+p.l+'</span></div>'+
+      '<div class="g2" style="margin-bottom:8px"><div class="field"><label>Origem</label><input type="text" id="orig'+i+'" value="'+p.o+'" oninput="calcAll()"></div><div class="field"><label>Destino</label><input type="text" id="dest'+i+'" value="'+p.d+'" oninput="calcAll()"></div></div>'+
+      '<div class="g3"><div class="field"><label>Saída</label><div style="display:flex;gap:4px"><input type="time" id="saida'+i+'" onchange="refreshDateTags();calcAll()" style="flex:1"><button class="stamp-btn" id="sbtnS'+i+'" onclick="stampTime(\'saida'+i+'\',\'sbtnS'+i+'\')"><i class="ti ti-player-play"></i></button></div></div>'+
+      '<div class="field"><label>Chegada</label><div style="display:flex;gap:4px"><input type="time" id="cheg'+i+'" onchange="refreshDateTags();calcAll()" style="flex:1"><button class="stamp-btn" id="sbtnC'+i+'" onclick="stampTime(\'cheg'+i+'\',\'sbtnC'+i+'\')"><i class="ti ti-player-stop"></i></button></div></div>'+
+      '<div class="field"><label>Tempo rota</label><input type="text" id="troute'+i+'" readonly placeholder="—"></div></div>'+
+      '<div class="tbadge" id="tbadge'+i+'" style="display:none"><span class="badge brota" id="brota'+i+'"></span><span class="badge bpar" id="bpar'+i+'" style="display:none"></span></div>';
+    c.appendChild(d);
+    if(i<3){var s=document.createElement('div');s.style.cssText='display:flex;align-items:center;gap:6px;margin:3px 0 3px 9px';s.innerHTML='<i class="ti ti-arrow-down" style="color:#1a3a6b"></i><span style="font-size:.75rem;color:#666">Tempo parado: <strong id="tpar'+i+'">—</strong></span>';c.appendChild(s);}
+  });
+}
+function calcAll(){
+  var tR=0,tP=0,hR=false,hP=false;
+  for(var i=0;i<4;i++){
+    var s=toMin(document.getElementById('saida'+i).value),e=toMin(document.getElementById('cheg'+i).value),rota=null;
+    if(s!==null&&e!==null){rota=e-s;if(rota<0)rota+=1440;document.getElementById('troute'+i).value=mStr(rota);document.getElementById('tbadge'+i).style.display='flex';document.getElementById('brota'+i).textContent='Rota: '+mStr(rota);tR+=rota;hR=true;}
+    else{document.getElementById('troute'+i).value='';document.getElementById('tbadge'+i).style.display='none';}
+    if(i<3){var ns=toMin(document.getElementById('saida'+(i+1)).value);if(e!==null&&ns!==null){var par=ns-e;if(par<0)par+=1440;document.getElementById('tpar'+i).textContent=mStr(par);if(rota!==null){document.getElementById('bpar'+i).textContent='Parado: '+mStr(par);document.getElementById('bpar'+i).style.display='';}tP+=par;hP=true;}else{document.getElementById('tpar'+i).textContent='—';document.getElementById('bpar'+i).style.display='none';}}
+  }
+  if(hR||hP){document.getElementById('resumoBox').style.display='';document.getElementById('resTotalRota').textContent=hR?mStr(tR):'—';document.getElementById('resTotalParado').textContent=hP?mStr(tP):'—';document.getElementById('resTotalDia').textContent=mStr(tR+tP);}
+  else document.getElementById('resumoBox').style.display='none';
+}
+
+// bibliotecas
+function renderBib(k){
+  var dm={tiposVeiculo:'listVeiculos',tiposCarga:'listCargas',placas:'listPlacas',postos:'listPostos'};
+  var data={tiposVeiculo:LV,tiposCarga:LC,placas:LP,postos:LO};
+  var el=document.getElementById(dm[k]);if(!el)return;
+  var arr=data[k];
+  if(!arr||!arr.length){el.innerHTML='<p style="font-size:.78rem;color:#888;padding:.35rem 0">Nenhum item.</p>';return;}
+  if(k==='placas'){
+    el.innerHTML=arr.map(function(p,i){return '<div class="bib-item"><i class="ti ti-license" style="color:#1a3a6b;flex-shrink:0"></i><span class="bib-name"><strong>'+p.placa+'</strong> — '+p.tipo+'</span><button class="btn btnd btnsm" onclick="delPlaca('+i+')"><i class="ti ti-trash"></i></button></div>';}).join('');
+  } else {
+    var ic={tiposVeiculo:'ti-truck',tiposCarga:'ti-package',postos:'ti-gas-station'}[k]||'ti-tag';
+    el.innerHTML=arr.map(function(c,i){
+      return '<div class="bib-item"><i class="ti '+ic+'" style="color:#1a3a6b;flex-shrink:0"></i>'+
+        '<span class="bib-name" id="bn'+k+i+'">'+c+'</span>'+
+        '<div class="bib-edit" id="be'+k+i+'"><input type="text" value="'+c+'" id="bi'+k+i+'"></div>'+
+        '<button class="btn btnsm" id="bed'+k+i+'" onclick="startBib(\''+k+'\','+i+')"><i class="ti ti-pencil"></i></button>'+
+        '<button class="btn btnsm" id="bok'+k+i+'" onclick="confirmBib(\''+k+'\','+i+')" style="display:none"><i class="ti ti-check"></i></button>'+
+        '<button class="btn btnd btnsm" onclick="delBib(\''+k+'\','+i+')"><i class="ti ti-trash"></i></button></div>';
+    }).join('');
+  }
+}
+function startBib(k,i){document.getElementById('bn'+k+i).style.display='none';document.getElementById('be'+k+i).style.display='flex';document.getElementById('bed'+k+i).style.display='none';document.getElementById('bok'+k+i).style.display='';document.getElementById('bi'+k+i).focus();}
+function confirmBib(k,i){
+  var v=document.getElementById('bi'+k+i).value.trim();if(!v)return;
+  if(k==='tiposVeiculo'){LV[i]=v;LV=sA(LV);SV('ct_tiposVeiculo',LV);}
+  else if(k==='tiposCarga'){LC[i]=v;LC=sA(LC);SV('ct_tiposCarga',LC);}
+  else if(k==='postos'){LO[i]=v;LO=sA(LO);SV('ct_postos',LO);}
+  refreshSels();renderBib(k);
+}
+function delBib(k,i){
+  if(k==='tiposVeiculo'){LV.splice(i,1);SV('ct_tiposVeiculo',LV);}
+  else if(k==='tiposCarga'){LC.splice(i,1);SV('ct_tiposCarga',LC);}
+  else if(k==='postos'){LO.splice(i,1);SV('ct_postos',LO);}
+  refreshSels();renderBib(k);
+}
+function addBib(k,id){
+  var v=document.getElementById(id).value.trim();if(!v)return;
+  if(k==='tiposVeiculo'){if(LV.indexOf(v)>=0){toast('Já existe!','w');return;}LV.push(v);LV=sA(LV);SV('ct_tiposVeiculo',LV);}
+  else if(k==='tiposCarga'){if(LC.indexOf(v)>=0){toast('Já existe!','w');return;}LC.push(v);LC=sA(LC);SV('ct_tiposCarga',LC);}
+  else if(k==='postos'){if(LO.indexOf(v)>=0){toast('Já existe!','w');return;}LO.push(v);LO=sA(LO);SV('ct_postos',LO);}
+  refreshSels();renderBib(k);document.getElementById(id).value='';toast('Adicionado!','ok');
+}
+function addPlaca(){var pl=document.getElementById('novaPlaca').value.trim().toUpperCase(),tp=document.getElementById('novaPlacaTipo').value;if(!pl||!tp)return;if(LP.find(function(x){return x.placa===pl&&x.tipo===tp;})){toast('Essa placa já está cadastrada com esse tipo!','w');return;}LP.push({placa:pl,tipo:tp});LP=sAO(LP,'placa');SV('ct_placas',LP);refreshSels();renderBib('placas');document.getElementById('novaPlaca').value='';document.getElementById('novaPlacaTipo').value='';toast('Placa adicionada!','ok');}
+function delPlaca(i){LP.splice(i,1);SV('ct_placas',LP);refreshSels();renderBib('placas');}
+function renderCargos(){
+  var el=document.getElementById('listCargos');if(!el)return;
+  if(!C.length){el.innerHTML='<p style="font-size:.78rem;color:#888;padding:.35rem 0">Nenhum.</p>';return;}
+  el.innerHTML=C.map(function(c,i){return '<div class="bib-item"><i class="ti ti-briefcase" style="color:#1a3a6b;flex-shrink:0"></i><span class="bib-name" id="cbn'+i+'">'+c+'</span><div class="bib-edit" id="cbe'+i+'"><input type="text" value="'+c+'" id="cbi'+i+'"></div><button class="btn btnsm" id="cedb'+i+'" onclick="startC('+i+')"><i class="ti ti-pencil"></i></button><button class="btn btnsm" id="cokb'+i+'" onclick="confirmC('+i+')" style="display:none"><i class="ti ti-check"></i></button><button class="btn btnd btnsm" onclick="delC('+i+')"><i class="ti ti-trash"></i></button></div>';}).join('');
+  refreshSels();
+}
+function startC(i){document.getElementById('cbn'+i).style.display='none';document.getElementById('cbe'+i).style.display='flex';document.getElementById('cedb'+i).style.display='none';document.getElementById('cokb'+i).style.display='';document.getElementById('cbi'+i).focus();}
+function confirmC(i){var v=document.getElementById('cbi'+i).value.trim();if(!v)return;C[i]=v;C=sA(C);SV('ct_cargos',C);renderCargos();}
+function delC(i){C.splice(i,1);SV('ct_cargos',C);renderCargos();}
+function addCargo(){var v=document.getElementById('novoCargo').value.trim();if(!v)return;if(C.indexOf(v)>=0){toast('Já existe!','w');return;}C.push(v);C=sA(C);SV('ct_cargos',C);renderCargos();document.getElementById('novoCargo').value='';toast('Cargo adicionado!','ok');}
+
+function refreshSels(){
+  var ps=document.getElementById('placa'),pc=ps.value;ps.innerHTML='<option value="">Selecione...</option>';LP.forEach(function(p){var o=document.createElement('option');o.value=p.placa+'::'+p.tipo;o.textContent=p.placa+' ('+p.tipo+')';if(o.value===pc)o.selected=true;ps.appendChild(o);});
+  var cs=document.getElementById('tipoCarga'),cc=cs.value;cs.innerHTML='<option value="">Selecione...</option>';LC.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;if(c===cc)o.selected=true;cs.appendChild(o);});
+  var ls=document.getElementById('localAbast'),lc=ls.value;ls.innerHTML='<option value="">Selecione...</option>';LO.forEach(function(p){var o=document.createElement('option');o.value=p;o.textContent=p;if(p===lc)o.selected=true;ls.appendChild(o);});
+  var nt=document.getElementById('novaPlacaTipo');if(nt){nt.innerHTML='<option value="">Tipo...</option>';LV.forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;nt.appendChild(o);});}
+  var fc=document.getElementById('fCargo');if(fc){fc.innerHTML='<option value="">Selecione...</option>';C.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;fc.appendChild(o);});}
+}
+
+// funcionários
+function renderFuncGrid(){
+  var g=document.getElementById('funcGrid');
+  g.innerHTML='';
+
+  // card Adicionar PRIMEIRO
+  var add=document.createElement('div');add.className='add-card';add.id='addFC';
+  add.innerHTML='<i class="ti ti-user-plus"></i><span style="font-size:.78rem;color:#666">Adicionar</span>';
+  g.appendChild(add);
+
+  // filtra por pesquisa
+  var searchEl=document.getElementById('searchFunc');
+  var search=searchEl?searchEl.value.trim().toLowerCase():'';
+
+  // ordena por cargo e depois por nome
+  var ordered=F.slice().sort(function(a,b){
+    var cc=a.cargo.localeCompare(b.cargo,'pt-BR',{sensitivity:'base'});
+    if(cc!==0)return cc;
+    return a.nome.localeCompare(b.nome,'pt-BR',{sensitivity:'base'});
+  }).filter(function(f){
+    if(!search)return true;
+    return f.nome.toLowerCase().indexOf(search)>=0;
+  });
+
+  for(var ii=0;ii<ordered.length;ii++){
+    var f=ordered[ii];
+    var i=F.indexOf(f); // índice real no array F
+    var d=document.createElement('div');
+    d.className='func-card'+(f.inativo?' inativo':'');
+    var tb=f.tipo==='admin'?'<span style="font-size:.68rem;background:#fff3e0;color:#b7770d;border-radius:4px;padding:1px 6px;font-weight:600;margin-top:2px;display:block;text-align:center">Admin</span>':'';
+    var ib=f.inativo?'<span style="font-size:.68rem;background:#eee;color:#999;border-radius:4px;padding:1px 6px;font-weight:600;margin-top:2px;display:block;text-align:center">Inativo</span>':'';
+    var isAdmGeral=(f.nome==='Administrador'&&f.tipo==='admin');
+    var btns=f.inativo
+      ?'<button class="btn btng btnsm" style="margin-top:6px;font-size:.7rem" data-reativar="'+i+'"><i class="ti ti-user-check"></i> Reativar</button>'
+      :(isAdmGeral?'':'<button class="btn btnsm" style="margin-top:6px;font-size:.7rem" data-editar="'+i+'"><i class="ti ti-pencil"></i> Editar</button>')+
+       '<button class="btn btnw btnsm" style="margin-top:4px;font-size:.7rem" data-senha="'+i+'"><i class="ti ti-key"></i> Senha</button>'+
+       (isAdmGeral?'':'<button class="btn btnd btnsm" style="margin-top:4px;font-size:.7rem" data-inativar="'+i+'"><i class="ti ti-user-off"></i> Inativar</button>');
+    d.innerHTML=
+      '<button class="fdel" data-del="'+i+'"><i class="ti ti-x"></i></button>'+
+      '<div class="f-av"'+(f.inativo?'':' data-foto="'+i+'"')+'>'+imgOrInit(f)+'</div>'+
+      (f.inativo?'':'<input type="file" id="fup'+i+'" accept="image/*" style="display:none">')+
+      '<div style="font-size:.85rem;font-weight:500;text-align:center;margin-top:4px">'+f.nome+'</div>'+
+      '<div style="font-size:.74rem;color:#666;text-align:center">'+f.cargo+'</div>'+
+      tb+ib+btns;
+    g.appendChild(d);
+  }
+
+  g.onclick=function(e){
+    var t=e.target.closest('[data-del],[data-foto],[data-senha],[data-inativar],[data-reativar],[data-editar],[id="addFC"]');
+    if(!t)return;
+    if(t.id==='addFC'){openFuncForm();return;}
+    var idx=parseInt(t.dataset.del!==undefined?t.dataset.del:t.dataset.foto!==undefined?t.dataset.foto:t.dataset.senha!==undefined?t.dataset.senha:t.dataset.inativar!==undefined?t.dataset.inativar:t.dataset.reativar!==undefined?t.dataset.reativar:t.dataset.editar);
+    if(t.dataset.del!==undefined){F.splice(idx,1);SV('ct_funcs',F);renderFuncGrid();buildLoginUsers();return;}
+    if(t.dataset.foto!==undefined){var fi=document.getElementById('fup'+idx);if(fi)fi.click();return;}
+    if(t.dataset.senha!==undefined){editFPass(idx);return;}
+    if(t.dataset.inativar!==undefined){F[idx].inativo=true;SV('ct_funcs',F);renderFuncGrid();buildLoginUsers();toast(F[idx].nome+' inativado.','ok');return;}
+    if(t.dataset.reativar!==undefined){F[idx].inativo=false;SV('ct_funcs',F);renderFuncGrid();buildLoginUsers();toast(F[idx].nome+' reativado!','ok');return;}
+    if(t.dataset.editar!==undefined){openEditFunc(idx);return;}
+  };
+  for(var j=0;j<F.length;j++){(function(idx){var fi=document.getElementById('fup'+idx);if(fi)fi.onchange=function(){updFoto(this,idx);};})( j);}
+}
+function updFoto(inp,idx){var r=new FileReader();r.onload=function(e){F[idx].foto=e.target.result;SV('ct_funcs',F);renderFuncGrid();};r.readAsDataURL(inp.files[0]);}
+function openFuncForm(){refreshSels();document.getElementById('funcForm').classList.add('open');document.getElementById('fNome').focus();}
+function closeFuncForm(){
+  document.getElementById('funcForm').classList.remove('open');
+  ['fNome','fSenha'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('fCargo').value='';
+  document.getElementById('fTipo').value='func';
+  document.getElementById('encPermBox').style.display='none';
+  var pv=document.getElementById('permVer');if(pv)pv.checked=true;
+  var pvi=document.getElementById('permVistar');if(pvi)pvi.checked=false;
+  var pr=document.getElementById('permRessalvar');if(pr)pr.checked=false;
+  document.getElementById('avPrev').style.display='none';
+  document.getElementById('avIcon').style.display='';
+  newAv=null;
+}
+function previewAv(inp){var r=new FileReader();r.onload=function(e){newAv=e.target.result;document.getElementById('avPrev').src=e.target.result;document.getElementById('avPrev').style.display='block';document.getElementById('avIcon').style.display='none';};r.readAsDataURL(inp.files[0]);}
+function toggleEncPermissoes(){
+  var t=document.getElementById('fTipo').value;
+  // mostra permissões para encarregado E admin (exceto o admin geral do sistema)
+  document.getElementById('encPermBox').style.display=(t==='encarregado'||t==='admin')?'block':'none';
+  // label muda conforme o tipo
+  var lbl=document.getElementById('encPermLabel');
+  if(lbl)lbl.textContent=t==='admin'?'Permissões do administrador':'Permissões do encarregado';
+}
+function saveFunc(){
+  var n=document.getElementById('fNome').value.trim(),c=document.getElementById('fCargo').value,s=document.getElementById('fSenha').value.trim(),t=document.getElementById('fTipo').value;
+  if(!n||!c||!s){toast('Preencha todos os campos!','w');return;}
+  // bloqueia cadastrar outro "Administrador" com mesmo nome do admin geral
+  if(t==='admin'&&n==='Administrador'){toast('O nome "Administrador" é reservado para o Admin Geral. Use outro nome.','w');return;}
+  var perms=null;
+  if(t==='encarregado'||t==='admin'){
+    var pv=document.getElementById('permVer'),pvi=document.getElementById('permVistar'),pr=document.getElementById('permRessalvar');
+    perms={ver:pv?pv.checked:false,vistar:pvi?pvi.checked:false,ressalvar:pr?pr.checked:false};
+    if(!perms.ver&&!perms.vistar&&!perms.ressalvar){toast('Selecione ao menos uma permissão!','w');return;}
+  }
+  F.push({nome:n,cargo:c,tipo:t,senha:s,foto:newAv||null,inativo:false,perms:perms});
+  SV('ct_funcs',F);closeFuncForm();buildLoginUsers();toast('Funcionário adicionado!','ok');renderFuncGrid();
+  document.getElementById('tab-funcionarios').scrollTop=0;
+}
+
+// modal editar funcionário
+function openEditFunc(i){
+  var f=F[i];
+  if(!f)return;
+  if(f.nome==='Administrador'&&f.tipo==='admin'){toast('O Admin Geral não pode ser editado por aqui.','w');return;}
+  editFuncIdx=i;
+  document.getElementById('editErr').style.display='none';
+  document.getElementById('editNome').value=f.nome;
+  var ec=document.getElementById('editCargo');
+  ec.innerHTML='<option value="">Selecione...</option>';
+  C.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;if(c===f.cargo)o.selected=true;ec.appendChild(o);});
+  document.getElementById('editTipo').value=f.tipo;
+  document.getElementById('editSenha').value='';
+  var perms=f.perms||{ver:true,vistar:false,ressalvar:false};
+  document.getElementById('editPermVer').checked=!!perms.ver;
+  document.getElementById('editPermVistar').checked=!!perms.vistar;
+  document.getElementById('editPermRessalvar').checked=!!perms.ressalvar;
+  toggleEditPermissoes();
+  document.getElementById('editFuncModal').classList.add('open');
+}
+function closeEditFunc(){
+  document.getElementById('editFuncModal').classList.remove('open');
+  editFuncIdx=-1;
+}
+function toggleEditPermissoes(){
+  var t=document.getElementById('editTipo').value;
+  document.getElementById('editPermBox').style.display=(t==='encarregado'||t==='admin')?'block':'none';
+  var lbl=document.getElementById('editPermLabel');
+  if(lbl)lbl.textContent=t==='admin'?'Permissões do administrador':'Permissões do encarregado';
+}
+function salvarEdicaoFunc(){
+  if(editFuncIdx<0||editFuncIdx>=F.length)return;
+  var err=document.getElementById('editErr');err.style.display='none';
+  var n=document.getElementById('editNome').value.trim(),c=document.getElementById('editCargo').value,t=document.getElementById('editTipo').value,s=document.getElementById('editSenha').value.trim();
+  if(!n||!c){err.textContent='Preencha nome e cargo!';err.style.display='block';return;}
+  if(n==='Administrador'){err.textContent='O nome "Administrador" é reservado para o Admin Geral. Use outro nome.';err.style.display='block';return;}
+  var perms=null;
+  if(t==='encarregado'||t==='admin'){
+    var pv=document.getElementById('editPermVer').checked,pvi=document.getElementById('editPermVistar').checked,pr=document.getElementById('editPermRessalvar').checked;
+    perms={ver:pv,vistar:pvi,ressalvar:pr};
+    if(!perms.ver&&!perms.vistar&&!perms.ressalvar){err.textContent='Selecione ao menos uma permissão!';err.style.display='block';return;}
+  }
+  var f=F[editFuncIdx];
+  f.nome=n;f.cargo=c;f.tipo=t;f.perms=perms;
+  if(s)f.senha=s;
+  SV('ct_funcs',F);
+  closeEditFunc();
+  buildLoginUsers();
+  renderFuncGrid();
+  toast('Funcionário atualizado!','ok');
+}
+
+// modal senha
+function editFPass(i){editPI=i;document.getElementById('passModalTitle').textContent='Alterar senha — '+F[i].nome;document.getElementById('passModalInput').value='';document.getElementById('passModalConfirm').value='';document.getElementById('passModalErr').style.display='none';document.getElementById('passModal').classList.add('open');setTimeout(function(){document.getElementById('passModalInput').focus();},100);}
+function confirmPassModal(){var np=document.getElementById('passModalInput').value.trim(),nc=document.getElementById('passModalConfirm').value.trim(),err=document.getElementById('passModalErr');err.style.display='none';if(!np){err.textContent='Digite a nova senha!';err.style.display='block';return;}if(np!==nc){err.textContent='As senhas não coincidem!';err.style.display='block';return;}if(editPI<0||editPI>=F.length)return;var nome=F[editPI].nome;F[editPI].senha=np;SV('ct_funcs',F);closePassModal();toast('Senha de '+nome+' alterada!','ok');}
+function closePassModal(){document.getElementById('passModal').classList.remove('open');editPI=-1;}
+
+// modal motorista
+function openFuncModal(){if(formLocked)return;var b=document.getElementById('funcModalBody');var ativos=F.filter(function(f){return !f.inativo;});if(!ativos.length){b.innerHTML='<div class="empty-st"><i class="ti ti-users"></i><p>Nenhum funcionário ativo.</p></div>';document.getElementById('funcModal').classList.add('open');return;}pickerAtivos=ativos;b.innerHTML='<input type="text" id="funcSearchInput" placeholder="Pesquisar nome..." oninput="filterFuncPicker()" style="width:100%;box-sizing:border-box;padding:.55rem .7rem;border:.5px solid #ccc;border-radius:6px;margin-bottom:.65rem;font-size:.85rem"><div id="funcPickerList"></div>';renderFuncPickerList(ativos);document.getElementById('funcModal').classList.add('open');setTimeout(function(){var si=document.getElementById('funcSearchInput');if(si)si.focus();},80);}
+function renderFuncPickerList(list){var l=document.getElementById('funcPickerList');if(!l)return;if(!list.length){l.innerHTML='<div class="empty-st"><i class="ti ti-search-off"></i><p>Nenhum funcionário encontrado.</p></div>';return;}l.innerHTML=list.map(function(f){var i=F.indexOf(f);return '<div class="pick-item" onclick="pickF('+i+')"><div class="pick-av">'+imgOrInit(f)+'</div><div><div style="font-size:.85rem;font-weight:500">'+f.nome+'</div><div style="font-size:.74rem;color:#666">'+f.cargo+'</div></div></div>';}).join('');}
+function filterFuncPicker(){var q=(document.getElementById('funcSearchInput').value||'').trim().toLowerCase();var filtered=!q?pickerAtivos:pickerAtivos.filter(function(f){return f.nome.toLowerCase().indexOf(q)>-1;});renderFuncPickerList(filtered);}
+function pickF(i){SF=F[i];var av=document.getElementById('selAvatar');av.innerHTML=(F[i].foto&&F[i].foto.length>10)?'<img src="'+F[i].foto+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display=\'none\'">':'<span style="font-weight:600;font-size:.88rem;color:#185FA5">'+inits(F[i].nome)+'</span>';document.getElementById('selPlaceholder').style.display='none';document.getElementById('selNome').textContent=F[i].nome;document.getElementById('selNome').style.display='';document.getElementById('selCargo').textContent=F[i].cargo;document.getElementById('selCargo').style.display='';document.getElementById('nomeCliente').value=F[i].nome;closeFuncModal();}
+function closeFuncModal(){document.getElementById('funcModal').classList.remove('open');}
+
+// assinatura
+function initSig(){sigCv=document.getElementById('sigCanvas');sigBx=document.getElementById('sigBox');sigCtx=sigCv.getContext('2d');function rs(){var r=sigBx.getBoundingClientRect();sigCv.width=r.width;sigCv.height=r.height;}rs();sigCv.addEventListener('mousedown',function(e){if(formLocked)return;sigDraw=true;var r=sigCv.getBoundingClientRect();sigCtx.beginPath();sigCtx.moveTo(e.clientX-r.left,e.clientY-r.top);document.getElementById('sigHint').style.display='none';});sigCv.addEventListener('mousemove',function(e){if(!sigDraw)return;var r=sigCv.getBoundingClientRect();sigCtx.lineTo(e.clientX-r.left,e.clientY-r.top);sigCtx.strokeStyle='#1a3a6b';sigCtx.lineWidth=2;sigCtx.lineCap='round';sigCtx.stroke();});sigCv.addEventListener('mouseup',function(){sigDraw=false;});sigCv.addEventListener('mouseleave',function(){sigDraw=false;});sigCv.addEventListener('touchstart',function(e){if(formLocked)return;e.preventDefault();sigDraw=true;var r=sigCv.getBoundingClientRect();var t=e.touches[0];sigCtx.beginPath();sigCtx.moveTo(t.clientX-r.left,t.clientY-r.top);document.getElementById('sigHint').style.display='none';},{passive:false});sigCv.addEventListener('touchmove',function(e){e.preventDefault();if(!sigDraw)return;var r=sigCv.getBoundingClientRect();var t=e.touches[0];sigCtx.lineTo(t.clientX-r.left,t.clientY-r.top);sigCtx.strokeStyle='#1a3a6b';sigCtx.lineWidth=2;sigCtx.lineCap='round';sigCtx.stroke();},{passive:false});sigCv.addEventListener('touchend',function(){sigDraw=false;});}
+function clearSig(){if(formLocked)return;sigCtx.clearRect(0,0,sigCv.width,sigCv.height);document.getElementById('sigHint').style.display='';}
+function setGrav(g){if(formLocked)return;grav=g;['None','Low','Med','High'].forEach(function(x){document.getElementById('gb'+x).className='grav-btn';});var el=document.getElementById('gb'+g.charAt(0).toUpperCase()+g.slice(1));if(g==='low')el.className='grav-btn ggl';else if(g==='med')el.className='grav-btn ggm';else if(g==='high')el.className='grav-btn ggh';}
+
+function showTab(t){
+  if(t==='novo'&&CU&&!podeIniciar()){toast('Apenas o Administrador Geral e Funcionários podem iniciar relatórios.','w');return;}
+  if((t==='funcionarios'||t==='bibliotecas')&&CU&&!podeGerenciar()){toast('Acesso restrito ao Administrador Geral.','w');return;}
+  ['novo','funcionarios','bibliotecas','historico'].forEach(function(x){document.getElementById('tab-'+x).style.display=x===t?'':'none';});
+  document.querySelectorAll('.nav-tab').forEach(function(el,i){el.classList.toggle('active',['novo','funcionarios','bibliotecas','historico'][i]===t);});
+  if(t==='historico')renderHistory();
+  if(t==='funcionarios'){renderFuncGrid();refreshSels();}
+  if(t==='bibliotecas'){['tiposVeiculo','tiposCarga','placas','postos'].forEach(renderBib);renderCargos();refreshSels();}
+}
+
+function gv(id){var el=document.getElementById(id);return el?el.value:'';}
+function saveReport(){
+  if(!SF){toast('Selecione um motorista!','w');return;}
+  if(!gv('horFim')){toast('Preencha a Hora final antes de salvar!','w');return;}
+  if(!gv('kmFim')){toast('Preencha o KM final antes de salvar!','w');return;}
+  var paradas=[];for(var i=0;i<4;i++)paradas.push({orig:gv('orig'+i),dest:gv('dest'+i),saida:gv('saida'+i),cheg:gv('cheg'+i),troute:gv('troute'+i)});
+  var r={id:Date.now(),num:gv('numRel'),data:gv('dataRel'),savedAt:Date.now(),motorista:SF.nome,motoristaCargo:SF.cargo,motoristaFoto:SF.foto||null,placa:gv('placa').split('::')[0],tipoVeiculo:gv('tipoVeiculoAuto'),horIni:gv('horIni'),kmIni:gv('kmIni'),horFim:gv('horFim'),kmFim:gv('kmFim'),totalHoras:gv('totalHoras'),totalKm:gv('totalKm'),paradas:paradas,tipoCarga:gv('tipoCarga'),nf:gv('nf'),peso:gv('peso'),volume:gv('volume'),diesel:gv('diesel'),arla:gv('arla'),consumoMedio:gv('consumoMedio'),localAbast:gv('localAbast'),ocorrencia:gv('ocorrencia'),gravidade:grav,nomeCliente:gv('nomeCliente'),assinatura:sigCv.toDataURL(),totalRota:document.getElementById('resTotalRota').textContent,totalParado:document.getElementById('resTotalParado').textContent,totalDia:document.getElementById('resTotalDia').textContent};
+  R.unshift(r);SV('ct_reports',R);toast('Relatório '+r.num+' salvo!','ok');clearForm();
+}
+function clearForm(){
+  ['placa','tipoCarga','nf','peso','volume','diesel','arla','localAbast','ocorrencia','nomeCliente','horIni','kmIni','horFim','kmFim','totalHoras','totalKm','consumoMedio','tipoVeiculoAuto'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  var pdChk=document.getElementById('horFimProxDia');if(pdChk)pdChk.checked=false;
+  for(var i=0;i<4;i++){['saida','cheg','troute'].forEach(function(f){var el=document.getElementById(f+i);if(el)el.value='';});document.getElementById('orig'+i).value=PARADAS[i].o;document.getElementById('dest'+i).value=PARADAS[i].d;var tb=document.getElementById('tbadge'+i);if(tb)tb.style.display='none';if(i<3){var tp=document.getElementById('tpar'+i);if(tp)tp.textContent='—';}}
+  ['horIni','horFim','saida0','cheg0','saida1','cheg1','saida2','cheg2','saida3','cheg3'].forEach(function(id){var t=document.getElementById('sd-'+id);if(t)t.remove();});
+  ['sbtnHI','sbtnHF'].forEach(function(id){var b=document.getElementById(id);if(b){b.className='stamp-btn';b.innerHTML='<i class="ti ti-'+(id==='sbtnHI'?'player-play':'player-stop')+'"></i>';}});
+  for(var i=0;i<4;i++){var bs=document.getElementById('sbtnS'+i),bc=document.getElementById('sbtnC'+i);if(bs){bs.className='stamp-btn';bs.innerHTML='<i class="ti ti-player-play"></i>';}if(bc){bc.className='stamp-btn';bc.innerHTML='<i class="ti ti-player-stop"></i>';}}
+  document.getElementById('resumoBox').style.display='none';setGrav('none');clearSig();SF=null;
+  document.getElementById('selAvatar').innerHTML='<i class="ti ti-user" style="font-size:1.05rem;color:#185FA5"></i>';
+  document.getElementById('selPlaceholder').style.display='';document.getElementById('selNome').style.display='none';document.getElementById('selCargo').style.display='none';
+  document.getElementById('numRel').value=nextNum();applyFormLock(false);
+}
+
+function renderHistory(){
+  var el=document.getElementById('reportList');
+  if(!R.length){el.innerHTML='<div class="empty-st"><i class="ti ti-clipboard-off"></i><p>Nenhum relatório.</p></div>';return;}
+  var gl={low:'<span style="color:#3B6D11;font-size:.72rem">● Baixa</span>',med:'<span style="color:#633806;font-size:.72rem">● Média</span>',high:'<span style="color:#A32D2D;font-size:.72rem">● Alta</span>'};
+  el.innerHTML=R.map(function(r){
+    var locked=checkLock(r),rota=r.paradas&&r.paradas[0]?r.paradas[0].orig+' → '+r.paradas[0].dest:'';
+    var lTag=locked?'<span class="rep-lock"><i class="ti ti-lock"></i> Finalizado</span>':'';
+    // visto badge
+    var vTag='';
+    var vResumo=vistoResumo(r);
+    if(vResumo){vTag=vResumo==='ok'?'<span style="font-size:.7rem;background:#eaf3de;color:#3B6D11;padding:2px 7px;border-radius:4px;font-weight:600">✅ OK</span>':'<span style="font-size:.7rem;background:#FAEEDA;color:#633806;padding:2px 7px;border-radius:4px;font-weight:600">⚠️ Ressalvas</span>';}
+    var dBtn=isAdm()?'<button class="btn btnsm btnd" onclick="delRep('+r.id+')"><i class="ti ti-trash"></i></button>':'';
+    var uBtn=isAdm()&&locked?'<button class="btn btnsm btnw" onclick="unlockRep('+r.id+')"><i class="ti ti-lock-open"></i></button>':'';
+    var meuV=podeVistar()?meuVisto(r):null;
+    var vBtn=podeVistar()?(meuV&&!isAdm()?'<button class="btn btnsm" style="border-color:#999;color:#999;cursor:not-allowed" disabled><i class="ti ti-clipboard-check"></i> Visto dado</button>':'<button class="btn btnsm" style="border-color:#6c3483;color:#6c3483" onclick="abrirVisto('+r.id+')"><i class="ti ti-clipboard-check"></i> '+(meuV?'Atualizar visto':'Dar visto')+'</button>'):'';
+    var vCount=getVistos(r).length;
+    return '<div class="rep-card"><div><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap"><strong style="font-size:.86rem">'+r.motorista+'</strong><span class="rep-num">'+r.num+'</span>'+(gl[r.gravidade]||'')+lTag+vTag+'</div><div class="rep-meta">'+fmtD(r.data)+(r.placa?' · '+r.placa:'')+(rota?' · '+rota:'')+(r.totalKm?' · '+r.totalKm:'')+(vCount?' · '+vCount+(vCount===1?' posicionamento':' posicionamentos'):'')+'</div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><button class="btn btnsm btnp" onclick="openView('+r.id+')"><i class="ti ti-eye"></i></button>'+vBtn+uBtn+dBtn+'</div></div>';
+  }).join('');
+}
+function delRep(id){R=R.filter(function(r){return r.id!==id;});SV('ct_reports',R);renderHistory();}
+function unlockRep(id){for(var i=0;i<R.length;i++){if(R[i].id===id){R[i].savedAt=Date.now();break;}}SV('ct_reports',R);renderHistory();toast('Desbloqueado por 1h.','ok');}
+
+function openView(id){
+  var r=R.find(function(x){return x.id===id;});if(!r)return;CVR=r;
+  // registra visualização se for encarregado
+  if(isEnc())registrarVisualizacao(id);
+  document.getElementById('viewTitle').textContent='Relatório '+r.num+' — '+fmtD(r.data);
+  var gl={none:'Nenhuma',low:'Baixa',med:'Média',high:'Alta'};var gc={none:'gn',low:'glo',med:'gme',high:'ghi'};
+  var ph=r.paradas.map(function(p,i){if(!p.saida&&!p.cheg&&!p.orig&&!p.dest)return'';return '<div class="vp"><div class="vptitle">'+(i+1)+'ª — '+(p.orig||'')+(p.dest?' → '+p.dest:'')+'</div><div class="vg3"><div class="vf"><div class="vl">Saída</div><div class="vv">'+(p.saida||'—')+'</div></div><div class="vf"><div class="vl">Chegada</div><div class="vv">'+(p.cheg||'—')+'</div></div><div class="vf"><div class="vl">Tempo</div><div class="vv">'+(p.troute||'—')+'</div></div></div></div>';}).join('');
+  var html='<div class="vhbox"><div class="vlogo">CARSTRAN</div><div><div style="font-size:.95rem;font-weight:600">Relatório Diário</div><div style="font-size:.78rem;color:#666">'+fmtD(r.data)+' · '+r.num+'</div></div></div>'+
+    '<div class="vsec"><div class="vstitle">Motorista e veículo</div><div class="vg2"><div class="vf"><div class="vl">Motorista</div><div class="vv">'+r.motorista+'</div></div><div class="vf"><div class="vl">Cargo</div><div class="vv">'+(r.motoristaCargo||'—')+'</div></div><div class="vf"><div class="vl">Placa</div><div class="vv">'+(r.placa||'—')+'</div></div><div class="vf"><div class="vl">Veículo</div><div class="vv">'+(r.tipoVeiculo||'—')+'</div></div></div></div>'+
+    '<div class="vsec"><div class="vstitle">Horário e KM</div><div class="vg2"><div class="vf"><div class="vl">Hora inicial</div><div class="vv">'+(r.horIni||'—')+'</div></div><div class="vf"><div class="vl">KM inicial</div><div class="vv">'+(r.kmIni||'—')+'</div></div><div class="vf"><div class="vl">Hora final</div><div class="vv">'+(r.horFim||'—')+'</div></div><div class="vf"><div class="vl">KM final</div><div class="vv">'+(r.kmFim||'—')+'</div></div><div class="vf"><div class="vl">Total horas</div><div class="vv">'+(r.totalHoras||'—')+'</div></div><div class="vf"><div class="vl">Total KM</div><div class="vv">'+(r.totalKm||'—')+'</div></div></div></div>'+
+    '<div class="vsec"><div class="vstitle">Rotas</div>'+ph+'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:.45rem"><div class="res-card" style="flex:1;min-width:85px"><div class="res-label">Total rota</div><div class="res-val">'+(r.totalRota||'—')+'</div></div><div class="res-card" style="flex:1;min-width:85px"><div class="res-label">Total parado</div><div class="res-val">'+(r.totalParado||'—')+'</div></div><div class="res-card" style="flex:1;min-width:85px"><div class="res-label">Total dia</div><div class="res-val">'+(r.totalDia||'—')+'</div></div></div></div>'+
+    '<div class="vsec"><div class="vstitle">Carga</div><div class="vg2"><div class="vf"><div class="vl">Tipo</div><div class="vv">'+(r.tipoCarga||'—')+'</div></div><div class="vf"><div class="vl">NF</div><div class="vv">'+(r.nf||'—')+'</div></div><div class="vf"><div class="vl">Peso (kg)</div><div class="vv">'+(r.peso||'—')+'</div></div><div class="vf"><div class="vl">Volume (m³)</div><div class="vv">'+(r.volume||'—')+'</div></div></div></div>'+
+    '<div class="vsec"><div class="vstitle">Abastecimento</div><div class="vg3"><div class="vf"><div class="vl">Diesel (L)</div><div class="vv">'+(r.diesel||'—')+'</div></div><div class="vf"><div class="vl">Arla (L)</div><div class="vv">'+(r.arla||'—')+'</div></div><div class="vf"><div class="vl">Local</div><div class="vv">'+(r.localAbast||'—')+'</div></div><div class="vf"><div class="vl">Consumo médio</div><div class="vv">'+(r.consumoMedio||'—')+'</div></div></div></div>'+
+    '<div class="vsec"><div class="vstitle">Ocorrências</div><div style="font-size:.85rem;margin-bottom:.45rem">'+(r.ocorrencia||'Nenhuma.')+'</div><span class="gbadge '+(gc[r.gravidade]||'gn')+'">'+(gl[r.gravidade]||'Nenhuma')+'</span></div>'+
+    '<div class="vsec"><div class="vstitle">Assinatura</div><div class="vf" style="margin-bottom:.5rem"><div class="vl">Nome</div><div class="vv">'+(r.nomeCliente||'—')+'</div></div>'+(r.assinatura?'<div class="view-sig"><img src="'+r.assinatura+'"></div>':'<div style="font-size:.8rem;color:#999">Sem assinatura</div>')+'</div>'+
+    (function(){
+      var vs=getVistos(r);
+      if(!vs.length)return'';
+      var itens=vs.slice().reverse().map(function(v){
+        return '<div style="margin-bottom:.6rem;padding-bottom:.6rem;border-bottom:.5px solid #f0f0f0">'+
+          '<div class="'+(v.status==='ok'?'visto-ok':'visto-res')+'">'+
+            (v.status==='ok'?'<i class="ti ti-circle-check"></i> <strong>OK — Aprovado</strong>':'<i class="ti ti-alert-triangle"></i> <strong>Verificado com ressalvas</strong>')+
+          '</div>'+
+          (v.ressalvas?'<div style="margin-top:.5rem;font-size:.83rem;color:#111;background:#fffde7;border:.5px solid #f9ca24;border-radius:6px;padding:.6rem .8rem">'+v.ressalvas+'</div>':'')+
+          '<div style="font-size:.75rem;color:#888;margin-top:.4rem"><strong>'+v.nome+'</strong> · '+(v.cargo||v.nome)+' · '+v.data+'</div>'+
+        '</div>';
+      }).join('');
+      return '<div class="vsec"><div class="vstitle">'+(vs.length>1?'Vistos ('+vs.length+' posicionamentos)':'Visto')+'</div>'+itens+'</div>';
+    })() +
+    (r.visualizacoes&&r.visualizacoes.length&&isAdm()?'<div class="vsec"><div class="vstitle">Histórico de visualizações</div>'+
+      r.visualizacoes.map(function(v){return '<div style="font-size:.78rem;color:#666;padding:.3rem 0;border-bottom:.5px solid #f0f0f0">'+v.data+' · <strong>'+v.nome+'</strong> ('+v.tipo+')</div>';}).join('')+
+    '</div>':'');
+  document.getElementById('viewContent').innerHTML=html;
+  var acts='<button class="btn btnsm" onclick="closeView()"><i class="ti ti-x"></i> Fechar</button>';
+  if(podeVistar()){
+    var meuVV=meuVisto(r);
+    if(meuVV&&!isAdm()){
+      acts+='<button class="btn btnsm" style="border-color:#999;color:#999;cursor:not-allowed" disabled><i class="ti ti-clipboard-check"></i> Visto dado</button>';
+    } else {
+      acts+='<button class="btn btnsm" style="border-color:#6c3483;color:#6c3483" onclick="closeView();abrirVisto('+r.id+')"><i class="ti ti-clipboard-check"></i> '+(meuVV?'Atualizar visto':'Dar visto')+'</button>';
+    }
+  }
+  if(isAdm()) acts+='<button class="btn btnp btnsm" onclick="printRep()"><i class="ti ti-printer"></i> PDF</button>';
+  document.getElementById('viewActions').innerHTML=acts;
+  document.getElementById('viewOverlay').classList.add('open');
+}
+function closeView(){document.getElementById('viewOverlay').classList.remove('open');}
+function printRep(){if(!CVR)return;var pa=document.getElementById('printArea');pa.innerHTML='<style>body{font-family:Arial,sans-serif;font-size:13px;color:#111}.vstitle{font-size:10px;font-weight:700;color:#1a3a6b;text-transform:uppercase;border-bottom:1px solid #cde;padding-bottom:3px;margin:12px 0 7px}.vg2{display:grid;grid-template-columns:1fr 1fr;gap:7px}.vg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}.vf{display:flex;flex-direction:column;gap:1px}.vl{font-size:10px;color:#888}.vv{font-size:12px;font-weight:500}.vp{border:1px solid #ddd;border-radius:5px;padding:7px;margin-bottom:5px}.vptitle{font-size:11px;font-weight:600;color:#1a3a6b;margin-bottom:5px}.view-sig img{max-width:200px;border:1px solid #ddd;border-radius:4px}.res-card{background:#f5f5f5;border-radius:4px;padding:5px 8px;display:inline-block;margin-right:5px}.res-label{font-size:9px;color:#888}.res-val{font-size:12px;font-weight:600;color:#1a3a6b}@media print{@page{margin:1.5cm}}</style>'+document.getElementById('viewContent').innerHTML;window.print();setTimeout(function(){pa.innerHTML='';},1000);}
+
+function exportBackup(){var d={v:2,date:new Date().toISOString(),reports:R,funcs:F,libs:{tiposVeiculo:LV,tiposCarga:LC,placas:LP,postos:LO},cargos:C};var b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='carstran_'+localDateStr()+'.json';a.click();URL.revokeObjectURL(u);toast('Backup exportado!','ok');}
+function importBackup(inp){var file=inp.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var d=JSON.parse(e.target.result);if(d.reports){R=d.reports;SV('ct_reports',R);}if(d.funcs){F=d.funcs;SV('ct_funcs',F);}if(d.libs){if(d.libs.tiposVeiculo){LV=d.libs.tiposVeiculo;SV('ct_tiposVeiculo',LV);}if(d.libs.tiposCarga){LC=d.libs.tiposCarga;SV('ct_tiposCarga',LC);}if(d.libs.placas){LP=d.libs.placas;SV('ct_placas',LP);}if(d.libs.postos){LO=d.libs.postos;SV('ct_postos',LO);}}if(d.cargos){C=d.cargos;SV('ct_cargos',C);}refreshSels();buildLoginUsers();toast('Importado!','ok');}catch(e){toast('Erro ao importar!','w');}};reader.readAsText(file);inp.value='';}
+
+buildLoginUsers();
+updConn();
+</script>
+</body>
+</html>
